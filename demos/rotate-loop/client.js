@@ -49,10 +49,31 @@ $('.ORBITAL > .INNER').append(`
 
 //rotate animation:
 const anime = require('animejs')
-anime({
-  targets:  '.ORBITAL',
-  rotateZ : 360,
-  easing: 'linear',
-  duration: 3000,
-  loop: true
+
+let z = 0
+const rotateZ = (degrees, direction) => {
+  if(direction == 'right') {
+    z = z + degrees
+  } else {
+    z = z - degrees
+  }
+  return z
+}
+$(document).on('keydown', e => {
+  if(e.code === 'ArrowLeft') {
+    anime({
+      targets:  '.ORBITAL',
+      rotateZ : rotateZ(10, 'left'),
+      easing: 'linear',
+      duration: 100
+    })
+  }
+  if(e.code === 'ArrowRight') {
+    anime({
+      targets:  '.ORBITAL',
+      rotateZ : rotateZ(10, 'right'),
+      easing: 'linear',
+      duration: 100
+    })
+  }
 })
