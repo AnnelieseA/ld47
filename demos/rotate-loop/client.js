@@ -57,23 +57,14 @@ const rotateZ = (degrees, direction) => {
   } else {
     z = z - degrees
   }
-  return z
+  anime({
+    targets:  '.ORBITAL',
+    rotateZ : z,
+    easing: 'linear',
+    duration: 100
+  })
 }
 $(document).on('keydown', e => {
-  if(e.code === 'ArrowLeft') {
-    anime({
-      targets:  '.ORBITAL',
-      rotateZ : rotateZ(10, 'left'),
-      easing: 'linear',
-      duration: 100
-    })
-  }
-  if(e.code === 'ArrowRight') {
-    anime({
-      targets:  '.ORBITAL',
-      rotateZ : rotateZ(10, 'right'),
-      easing: 'linear',
-      duration: 100
-    })
-  }
+  if(e.code === 'ArrowLeft') rotateZ(10, 'left')
+  if(e.code === 'ArrowRight') rotateZ(10, 'right')
 })
