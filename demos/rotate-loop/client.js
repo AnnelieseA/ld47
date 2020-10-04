@@ -37,52 +37,54 @@ $('.ORBITAL > .INNER').append(`
 
 //rotate animation:
 const anime = require('animejs')
-
-//via https://stackoverflow.com/a/11840120
-function getRotationDegrees(obj) {
-  var matrix = obj.css("-webkit-transform") ||
-    obj.css("-moz-transform")    ||
-    obj.css("-ms-transform")     ||
-    obj.css("-o-transform")      ||
-    obj.css("transform");
-  if(matrix !== 'none') {
-    var values = matrix.split('(')[1].split(')')[0].split(',');
-    var a = values[0];
-    var b = values[1];
-    var angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
-  } else { var angle = 0; }
-  return (angle < 0) ? angle + 360 : angle;
-}
-
-const idleAnime = () => anime({
+const animate = () => anime({
   targets:  '.ORBITAL',
-  rotateZ : [getRotationDegrees($( '.ORBITAL' )) , 360],
+  rotateZ : 360,
   easing: 'linear',
-  duration: 5000,
-  complete: anim => idleAnime()
+  autoplay : false,
+  loop : true
 })
 
-let z = 0
-const rotateZ = (degrees, direction) => {
-  z = getRotationDegrees($( '.ORBITAL' ))
-  if(direction == 'right') {
-    z = z + degrees
-  } else {
-    z = z - degrees
-  }
-  //idleRotationAnime.pause()
-  anime.remove('.ORBITAL')
-  anime({
-    targets:  '.ORBITAL',
-    rotateZ : z,
-    easing: 'linear',
-    duration: 300,
-    complete: anim => idleAnime() //< continue idle anim
-  })
-}
+//handle input; advance/brake speed on keydown, reset back to idle speed on keyup:
 $(document).on('keydown', e => {
-  if(e.code === 'ArrowLeft') rotateZ(0, 'left')
-  if(e.code === 'ArrowRight') rotateZ(30, 'right')
+  if(e.code === 'ArrowLeft') timeManager.updateSpeed(0.08)
+  if(e.code === 'ArrowRight') timeManager.updateSpeed(0.8)
 })
+$(document).on('keyup', () => timeManager.updateSpeed(idleSpeed))
 
-idleAnime()
+class TimeMagic {
+  constructor(speed) {
+    this.accumulateTime = -1
+    this.lastTime = -1
+    this.speed = speed
+  }
+  updateTime(t) {
+    if (this.accumulateTime === -1) {
+      this.accumulateTime = t
+    } else {
+      const deltaT = t - this.lastTime
+      this.accumulateTime += deltaT * this.speed
+    }
+    this.lastTime = t
+  }
+  updateSpeed(speed) {
+    this.speed = speed
+  }
+  getTime() {
+    return this.accumulateTime
+  }
+}
+const timeManager = new TimeMagic(1)
+
+//set speed and begin animation loop:
+const idleSpeed = 0.25
+timeManager.updateSpeed(idleSpeed)
+
+let animation = animate()
+
+function loop(t) {
+  timeManager.updateTime(t)
+  animation.tick(timeManager.getTime())
+  customRAF = requestAnimationFrame(loop)
+}
+requestAnimationFrame(loop)
