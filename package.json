@@ -1,8 +1,6 @@
 {
   "name": "ld47",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "devDependencies": {
     "nodejs-html": "^0.0.2",
     "@babel/core": "7.5.5",
@@ -12,12 +10,15 @@
     "stringify": "^5.2.0",
     "watchify": "^3.11.1"
   },
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "compile" : "node compile.js"
+  },
   "dependencies": {
     "animejs": "^3.2.0",
+    "async": "^3.2.0",
     "babylonjs": "^4.1.0",
     "jquery": "^3.5.1",
-    "underscore": "^1.11.0"
+    "underscore": "^1.11.0",
+    "underscore.string": "^3.3.5"
   }
 }
