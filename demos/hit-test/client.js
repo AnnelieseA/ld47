@@ -176,16 +176,37 @@ const loop = t => {
 }
 requestAnimationFrame(loop)
 
-setInterval( () => {
-  let x = parseInt(  $botB.offset().left +10 )
-  let y = parseInt(  $botB.offset().top -5 )
+let overlapCounter = 0
+let victory = false
 
-  const element = document.elementFromPoint(x, y)
-  if($(element).hasClass('BOT')){
+setInterval( () => {
+  let botAx = parseInt(  $botA.offset().left)
+  let botAy = parseInt(  $botA.offset().top )
+  //console.log( `botA x: ${botAx}  y: ${botAy} `)
+
+  let botBx = parseInt(  $botB.offset().left)
+  let botBy = parseInt(  $botB.offset().top )
+  //console.log( `botB x: ${botBx}  y: ${botBy} `)
+
+  let differenceX = Math.abs(  botAx - botBx )
+  let differenceY = Math.abs(  botAy - botBy )
+  //console.log( `differenceX: ${differenceX}  differenceY: ${differenceY} `)
+  //console.log(overlapCounter)
+
+  if( differenceX <  42  &&   differenceY < 22) {
     $('.BOT').css('background-color', 'deeppink')
+    overlapCounter++
+    if(overlapCounter > 15) {
+      $('.BOT').css('background-color', 'lightblue')
+      $botA.remove()
+      $botB.css('background-color', 'limegreen')
+      victory = true
+      //update controls so player can control the new loop...
+    }
   } else {
+    if(victory) return
+    overlapCounter = 0
     $botA.css('background-color', 'limegreen')
     $botB.css('background-color', 'white')
   }
-  console.log(   element )
 }, 25)
