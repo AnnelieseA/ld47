@@ -116,7 +116,9 @@ const animate = id => {
             autoplay: false,
             loop: true
           }),
-          timeManagerLoop : timeManagerLoop
+          timeManagerLoop : timeManagerLoop,
+          $bot : animationWithAnim.$bot,
+          name : animationWithAnim.name
         }
       )
     }
@@ -157,19 +159,22 @@ class TimeMagic {
 const idleSpeed = 0.25
 
 let animations = [{
-  name : 'A',
-  anime : animate($loopContainerElementA.attr('id')),
-  timeManagerLoop : new TimeMagic(1)
-},
+    name : 'A',
+    anime : animate($loopContainerElementA.attr('id')),
+    timeManagerLoop : new TimeMagic(1),
+    $bot : $botA
+  },
   {
     name : 'B',
     anime : animate($loopContainerElementB.attr('id')),
-    timeManagerLoop : new TimeMagic(1)
+    timeManagerLoop : new TimeMagic(1),
+    $bot : $botB
   },
   {
     name : 'C',
     anime : animate($loopContainerElementC.attr('id')),
-    timeManagerLoop : new TimeMagic(1)
+    timeManagerLoop : new TimeMagic(1),
+    $bot : $botC
   }
 ]
 
@@ -186,41 +191,69 @@ const loop = t => {
 }
 requestAnimationFrame(loop)
 
-let overlapCounter = 0
-let victory = false
+
+let hitChecks = [{
+  $bot : $botB,
+  overlapCounter : 0,
+  victory : false
+},
+{
+  $bot : $botC,
+  overlapCounter : 0,
+  victory : false
+}]
 
 setInterval( () => {
-  let botAx = parseInt(  $botA.offset().left)
-  let botAy = parseInt(  $botA.offset().top )
-  //console.log( `botA x: ${botAx}  y: ${botAy} `)
+  let $playerBot = playerAnimation.$bot
 
-  let botBx = parseInt(  $botB.offset().left)
-  let botBy = parseInt(  $botB.offset().top )
-  //console.log( `botB x: ${botBx}  y: ${botBy} `)
+  hitChecks.forEach( hitCheck => {
+    let $targetBot = hitCheck.$bot
+    let botAx = parseInt(  $playerBot.offset().left)
+    let botAy = parseInt(  $playerBot.offset().top )
+    //console.log( `botA x: ${botAx}  y: ${botAy} `)
 
-  let differenceX = Math.abs(  botAx - botBx )
-  let differenceY = Math.abs(  botAy - botBy )
-  //console.log( `differenceX: ${differenceX}  differenceY: ${differenceY} `)
-  //console.log(overlapCounter)
+    let botBx = parseInt(  $targetBot.offset().left)
+    let botBy = parseInt(  $targetBot.offset().top )
+    //console.log( `botB x: ${botBx}  y: ${botBy} `)
 
-  if( differenceX <  42  &&   differenceY < 22) {
-    $('.BOT.PLAYER').css('background-color', 'deeppink')
-    $botB.css('background-color', 'deeppink')
-    overlapCounter++
-    if(overlapCounter > 15) {
-      $('.BOT.PLAYER').css('background-color', 'lightblue')
-      $botB.css('background-color', 'lightblue')
+    let differenceX = Math.abs(  botAx - botBx )
+    let differenceY = Math.abs(  botAy - botBy )
+    //console.log( `differenceX: ${differenceX}  differenceY: ${differenceY} `)
+    //console.log(overlapCounter)
 
-      $botA.remove()
-      $botB.css('background-color', 'limegreen').addClass('PLAYER')
-      victory = true
-      //update controls so player can control the new loop...
-      playerAnimation = _.findWhere(animations, { name : 'B'})
+    if( differenceX <  42  &&   differenceY < 22) {
+      $playerBot.css('background-color', 'deeppink')
+      $targetBot.css('background-color', 'deeppink')
+      hitCheck.overlapCounter++
+      if(hitCheck.overlapCounter > 5) { //15 is good for outer loop
+        $playerBot.css('background-color', 'lightblue').removeClass('PLAYER').addClass('REMOVE')
+        $targetBot.css('background-color', 'lightblue')
+
+        $targetBot.css('background-color', 'limegreen').addClass('PLAYER')
+        hitCheck.victory = true
+
+        //update active playerAnimation to the new bot;
+        //which also updates controls so player can control the new loop,
+
+        playerAnimation = _.find(animations, animation => {
+          return animation.$bot.hasClass('PLAYER')
+        })
+
+        //remove the old animation:
+        let oldAnimation = _.find(animations, animation => {
+          return animation.$bot.hasClass('REMOVE')
+        })
+        animations = _.without(animations, oldAnimation)
+        $('.REMOVE').remove()
+
+        hitCheck.overlapCounter = 0
+        hitChecks = _.without( hitChecks, hitCheck)
+      }
+    } else {
+      if(hitCheck.victory) return
+      hitCheck.overlapCounter = 0
+      $targetBot.css('background-color', 'white')
+      $playerBot.css('background-color', 'limegreen')
     }
-  } else {
-    if(victory) return
-    overlapCounter = 0
-    $('.BOT').css('background-color', 'white')
-    $('.BOT.PLAYER').css('background-color', 'limegreen')
-  }
+  })
 }, 25)
