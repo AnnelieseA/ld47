@@ -2,21 +2,24 @@
   "name": "ld47",
   "version": "1.0.0",
   "devDependencies": {
-    "nodejs-html": "^0.0.2",
+    "nodejs-html": "^0.0.3",
     "@babel/core": "7.5.5",
     "@babel/preset-env": "7.5.5",
+    "@babel/runtime": "^7.11.2",
+    "@babel/plugin-transform-runtime": "^7.11.5",
     "babelify": "10.0.0",
     "browserify": "^16.5.2",
     "stringify": "^5.2.0",
     "watchify": "^3.11.1"
   },
   "scripts": {
-    "compile" : "node compile.js"
+    "compile": "node compile.js"
   },
   "dependencies": {
     "animejs": "^3.2.0",
     "async": "^3.2.0",
     "babylonjs": "^4.1.0",
+    "babylonjs-loaders": "^4.1.0",
     "jquery": "^3.5.1",
     "underscore": "^1.11.0",
     "underscore.string": "^3.3.5"
