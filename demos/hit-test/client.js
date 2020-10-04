@@ -118,10 +118,10 @@ const animate = id => {
 
 //handle input; advance/brake speed on keydown, reset back to idle speed on keyup:
 $(document).on('keydown', e => {
-  if(e.code === 'ArrowLeft') timeManagerLoopA.updateSpeed(0.08)
-  if(e.code === 'ArrowRight') timeManagerLoopA.updateSpeed(0.8)
+  if(e.code === 'ArrowLeft') playerAnimation.timeManagerLoop.updateSpeed(0.08)
+  if(e.code === 'ArrowRight') playerAnimation.timeManagerLoop.updateSpeed(0.8)
 })
-$(document).on('keyup', () => timeManagerLoopA.updateSpeed(idleSpeed))
+$(document).on('keyup', () => playerAnimation.timeManagerLoop.updateSpeed(idleSpeed))
 
 class TimeMagic {
   constructor(speed) {
@@ -158,14 +158,18 @@ timeManagerLoopA.updateSpeed(idleSpeed)
 timeManagerLoopB.updateSpeed(idleSpeed)
 
 let animations = [{
+  name : 'A',
   anime : animationA,
   timeManagerLoop : timeManagerLoopA
 },
-  {
-    anime : animationB,
-    timeManagerLoop : timeManagerLoopB
-  }
+{
+  name : 'B',
+  anime : animationB,
+  timeManagerLoop : timeManagerLoopB
+}
 ]
+
+let playerAnimation = animations[0]
 
 const loop = t => {
   animations.forEach( animation => {
@@ -202,6 +206,7 @@ setInterval( () => {
       $botB.css('background-color', 'limegreen')
       victory = true
       //update controls so player can control the new loop...
+      playerAnimation = _.findWhere(animations, { name : 'B'})
     }
   } else {
     if(victory) return
