@@ -22,12 +22,19 @@ async function getFiles(dir) {
 
 getFiles(__dirname + '/demos')
 .then(files => { //filter only folders containing "make.js" ....
-  let clientFiles = _.filter(files, file => file.search('make.js') > -1)
+  let clientFiles = _.filter(files, file => {
+    if( file.search('make.js') > -1 ) return file
+    if( file.search('run.js') > -1 ) return file
+    return false
+  })
 
   //loop and run compile over each of them:
   async.eachSeries( clientFiles, (clientFile, callback) => {
     let dir = _s.strLeftBack(clientFile, '/')
-    cp.exec(`cd ${dir}; node make < /dev/tty`, (err, stdout, stderr) => {
+    let command = 'make'
+    console.log(clientFile)
+    if(clientFile.search('run.js') > -1) command = 'run'
+    cp.exec(`cd ${dir}; node ${command} < /dev/tty`, (err, stdout, stderr) => {
       if (err) return console.error(err)
       console.log(stdout)
       console.log(stderr)
