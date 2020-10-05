@@ -19,15 +19,8 @@ var CreateScene = function () {
 
     var camera = new BABYLON.ArcRotateCamera("Camera", BABYLON.Tools.ToRadians(-80), BABYLON.Tools.ToRadians(80), 280, new BABYLON.Vector3(0, 0, 0), scene);    
     camera.attachControl(canvas, true);
-    
-    /*
-     global.camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(-26.700, 80.173, -5.470), scene);
-
-    // Set camera rotation and target:
-    camera.rotation =  new BABYLON.Vector3(69.403, 82.248, 0);
-    camera.setTarget(new BABYLON.Vector3(-1.532, 12.588, -2.044));
-    */
     camera.setTarget(new BABYLON.Vector3(0, 0, 0));
+
     var ringArray = [];   
     var goodRobot;
     var evilRobot;
@@ -36,6 +29,9 @@ var CreateScene = function () {
     mainNode.position = new BABYLON.Vector3(0,-50,0);
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+    light.specular =  new BABYLON.Color3.FromHexString('#ED7239');
+    light.diffuse = new BABYLON.Color3.FromHexString('#CA6334');
+    light.intensity = 0.25;
 
     //Main dude
     var hero =  BABYLON.Mesh.CreateSphere("robot", 16, 10, scene);
@@ -46,6 +42,10 @@ var CreateScene = function () {
     var heroSpeed = 1;
     var heroSpeedBackwards = 0.5;
     var heroRotationSpeed = 0.1;
+
+    hero.material = new BABYLON.StandardMaterial("heroMaterial", scene);
+    hero.material.diffuseColor = new BABYLON.Color3.FromHexString('#CF6838');
+    //hero.material.emissiveColor = BABYLON.Color3.FromHexString('#33C268')
 
     // Keyboard events
     var inputMap = {};
@@ -152,8 +152,6 @@ var CreateScene = function () {
         var angleArray = [];
         var angle = 0;
         for (var i=0; i<numBots; i++ ) {
-            //angle = randomInteger(1,360);
-            //angleArray.push(BABYLON.Tools.ToRadians(angle));
             angle = angle + Math.PI / randomInteger(1,6)
             angleArray.push(angle);
         }
@@ -166,9 +164,6 @@ var CreateScene = function () {
     scene.beforeRender = function () {   
         ringArray.forEach( ring => {
             ring.pivot.rotate(BABYLON.Axis.Y, ring.speed, BABYLON.Space.LOCAL);
-            //ring.refBall.position = ring.pivot.position;
-            //ring.pivot.rotate(BABYLON.Axis.Y, ring.speed, BABYLON.Space.WORLD);
-            //ring.pivot.position.add(new BABYLON.Vector3(10 * Math.sin(alpha), 0, 10 * Math.cos(alpha)));
             ring.pivot.getChildren().forEach( bot => {
                 if (hero.intersectsMesh(bot, false)) {
 
