@@ -29,7 +29,7 @@ const canvas = document.getElementById('renderCanvas')
 const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true})
 
 //idle rotation speed:
-let idleSpeed = 0.9
+let idleSpeed = 1.5
 let incrementRate = idleSpeed
 
 global.setParent = ( children, parent ) => {
@@ -256,7 +256,7 @@ global.initGame = async () => {
 
   $(document).on('keydown', e => {
     console.log('keydown')
-    if(e.code === 'ArrowRight') incrementRate = 1.5
+    if(e.code === 'ArrowRight') incrementRate = 2
     if(e.code === 'ArrowLeft') incrementRate = idleSpeed - 0.5
     if(e.code === 'Escape') {
       pausing ? unpause() : pause()
