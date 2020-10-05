@@ -56,6 +56,10 @@ const createScene = async () => {
   arena.position.x = 1
   arena.scaling.scaleInPlace(2)
 
+  loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "dome.gltf", scene)
+  global.dome = loadedMesh.meshes[0]
+  dome.scaling.scaleInPlace(4)
+
   return scene
 }
 
