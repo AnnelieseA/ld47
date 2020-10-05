@@ -1,7 +1,8 @@
 console.log('hello stuck loop world (babylonjs)')
 
-const $ = require('jquery')
+global.$ = require('jquery')
 const _ = require('underscore')
+
 
 $('body').addClass('bg-black').append(`
   <canvas id="renderCanvas"  class="hide"
@@ -290,3 +291,12 @@ global.exitGame = () => {
   $('#pauseUI').html(`<div class="mute-30 center white p2">(you exited)</div>`)
 }
 
+if(window.location.hash === '#play') {
+  initGame()
+} else {
+  // no idea why the timeout is needed:
+  $('#introUI').removeClass('hide')
+  setTimeout( () => {
+    $('#introUI').removeClass('hide')
+  }, 1000)
+}

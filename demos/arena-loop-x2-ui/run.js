@@ -19,11 +19,10 @@ $('head').append(`
   <script src="https://preview.babylonjs.com/babylon.js"></script>
   <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/masscss/mass.css" />
 `)
 
 $('body').append(`
-  <div id="introUI" onclick="initGame()" class="cursor-pointer mute-20 hv-unmute">
+  <div id="introUI" onclick="initGame()" class="cursor-pointer mute-20 hv-unmute hide">
     <img src="img/play.png" />
   </div>
   <div id="pauseUI" onclick="exitGame()" class="cursor-pointer mute-20 hv-unmute hide absolute top-0 bg-black">

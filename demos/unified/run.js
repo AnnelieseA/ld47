@@ -23,7 +23,7 @@ $('body').append(`
     <a href="/demos/babylon-demo" class="mute-20 hv-unmute">
       <img src="img/free.png" />
     </a>
-    <a href="/demos/arena-loop-x2-ui" class="mute-20 hv-unmute">
+    <a href="/demos/arena-loop-x2-ui#play" class="mute-20 hv-unmute">
       <img src="img/stuck.png" />
     </a>
   </div>
