@@ -254,8 +254,8 @@ global.initGame = async () => {
 
   $(document).on('keydown', e => {
     console.log('keydown')
-    if(e.code === 'KeyD') incrementRate = 1
-    if(e.code === 'KeyA') incrementRate = 0.1
+    if(e.code === 'ArrowRight') incrementRate = 1
+    if(e.code === 'ArrowLeft') incrementRate = 0.1
     if(e.code === 'Escape') {
       pausing ? unpause() : pause()
     }
