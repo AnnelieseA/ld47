@@ -29,6 +29,10 @@ $('body').append(`
   </div>
 `).addClass('bg-black p3')
 
+$('head').append(`
+<script async defer data-domain="ld47.dystoth.com" src="https://plausible.io/js/plausible.js"></script>
+`)
+
 if(serve) {
   no.server(8206)
   no.makeIndex(null, $.html() )
