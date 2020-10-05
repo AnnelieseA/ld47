@@ -32,6 +32,8 @@ var CreateScene = function () {
     var goodRobot;
     var evilRobot;
 
+    var mainNode = new BABYLON.TransformNode("root");
+    mainNode.position = new BABYLON.Vector3(0,-50,0);
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
@@ -126,7 +128,8 @@ var CreateScene = function () {
         //Center of the ring
         this.pivot = new BABYLON.TransformNode("root");
         this.pivot.position = ringPosition;
-    
+        this.pivot.parent = mainNode;
+
         angleList.forEach(angle => {
             var z = radius * Math.sin(angle);
             var x = radius * Math.cos(angle);
@@ -147,10 +150,12 @@ var CreateScene = function () {
         var numBots = randomInteger(2,6);
         var speed = randomInteger(50,150);
         var angleArray = [];
-        var angle;
+        var angle = 0;
         for (var i=0; i<numBots; i++ ) {
-            angle = randomInteger(1,360);
-            angleArray.push(BABYLON.Tools.ToRadians(angle));
+            //angle = randomInteger(1,360);
+            //angleArray.push(BABYLON.Tools.ToRadians(angle));
+            angle = angle + Math.PI / randomInteger(1,6)
+            angleArray.push(angle);
         }
         ringArray.push(new RobotRing(new BABYLON.Vector3(x,0,z), Math.PI / speed, radius, angleArray));
     }
@@ -173,6 +178,7 @@ var CreateScene = function () {
                 }
             });
         });
+        mainNode.rotate(BABYLON.Axis.Y, Math.PI / 300, BABYLON.Space.LOCAL)
         alpha+=0.2;
     };
     
