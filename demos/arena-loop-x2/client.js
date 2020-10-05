@@ -9,7 +9,7 @@ $('body').addClass('bg-silver').append(`
           height: 600px;
           touch-action: none;">
   </canvas>
-  <p>Press Right/Left arrow keys to slow/speedup rotation</p>
+  <p>Press A or D slow/speedup bot, arrow keys for camera movement and click & drag for camera rotation</p>
 `)
 
 //little math helper:
@@ -47,7 +47,6 @@ const createScene = async () => {
   light.diffuse = new BABYLON.Color3(0.922, 0.855, 0.710)
   light.position.y = 22.573
 
-
   //load meshes:
   let loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "good_bot2.0.gltf", scene)
   global.goodBot = loadedMesh.meshes[0]
@@ -80,6 +79,17 @@ const createScene = async () => {
   ring.scaling = new BABYLON.Vector3( 15, 15, -15 )
   ring._children [0].material.anisotropy.isEnabled = true
   ring._children [0].material.anisotropy.intensity = 0.86
+
+  //### 2nd bot and ring ####
+  loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "evil_bot_2.0.gltf", scene)
+  global.evilBot = loadedMesh.meshes[0]
+
+  evilBot.position = new BABYLON.Vector3(-1.988, 1.029, -9.185)
+  evilBot.name = 'evilBot'
+  evilBot.scaling = new BABYLON.Vector3(2.694, 2.694, 2.694)
+
+  // let evilBotSphere = _.findWhere(evilBot._children, { id: "Cube.001"})
+  // evilBotSphere.setEnabled(false)
 
   loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "ring2.gltf", scene)
   global.ring2 = loadedMesh.meshes[0]
@@ -134,6 +144,7 @@ const createScene = async () => {
   ring2.parent = midNode2
   sphere2.parent = midNode2
   sphere2Light.parent = midNode2
+  evilBot.parent = midNode2
 
   //rotation animation:
   let degrees = 0
@@ -154,7 +165,7 @@ const createScene = async () => {
 (async function() {
   const scene = await createScene()
   engine.runRenderLoop(() => scene.render())
-  scene.debugLayer.show()
+  //scene.debugLayer.show()
   let gl = new BABYLON.GlowLayer("glow", scene)
 
   $(document).on('keydown', e => {
