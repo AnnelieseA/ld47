@@ -18,6 +18,7 @@ let $ = no.jquery(html)
 $('head').append(`
   <script src="https://preview.babylonjs.com/babylon.js"></script>
   <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
 `)
 
 if(serve) {
