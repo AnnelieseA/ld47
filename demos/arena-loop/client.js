@@ -47,15 +47,16 @@ const createScene = async () => {
   //load meshes:
   let loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "good_bot2.0.gltf", scene)
   global.goodBot = loadedMesh.meshes[0]
-  goodBot.position.z = -25.736
-  goodBot.position.y = 1.446
+  goodBot.position = new BABYLON.Vector3(-1.98, 4.939, -26.867)
   goodBot.name = 'goodBot'
-  goodBot.scaling.scaleInPlace(2)
-  goodBot.setEnabled(false)
+  goodBot.scaling = new BABYLON.Vector3(2.694, 2.694,2.694)
+
+  let goodBotSphere = _.findWhere(goodBot._children, { id: "Cube.001"})
+  goodBotSphere.setEnabled(false)
 
   let sphere = BABYLON.Mesh.CreateSphere('sphere', 16, 2.5, scene, false, BABYLON.Mesh.FRONTSIDE)
   // Move sphere into position:
-  sphere.position = new BABYLON.Vector3( -2, 4.548, -25.897)
+  sphere.position = new BABYLON.Vector3( -2, 4.548, -27.562)
 
   // Create a basic light
   let sphereLight = new BABYLON.PointLight('sphereLight', new BABYLON.Vector3(-2, 4.548, -25.897, scene))
@@ -73,8 +74,7 @@ const createScene = async () => {
   whiteMaterial.diffuseColor = new BABYLON.Color3(255, 255, 255)
   whiteMaterial.name = 'whiteMaterial'
   whiteMaterial.emissiveColor = BABYLON.Color3.FromHexString('#ff1493')
-  //green: #33C268
-  //pink: #ff1493
+  //green: #33C268, pink: #ff1493
   sphere.material = whiteMaterial
 
   loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "arena.gltf", scene)
@@ -96,6 +96,7 @@ const createScene = async () => {
   sphere.parent = midNode
   sphereLight.parent = midNode
   ring.parent = midNode
+  goodBot.parent = midNode
 
   //shadows... no diff?
   arenaPlane.receiveShadows = true
@@ -108,6 +109,7 @@ const createScene = async () => {
   //rotation animation:
   let degrees = 0
   scene.registerAfterRender( () => {
+    //return
     midNode.rotation.y = degreesToRadians(degrees + 1)
     degrees = degrees + 1
   })
@@ -118,7 +120,7 @@ const createScene = async () => {
 (async function() {
   const scene = await createScene()
   engine.runRenderLoop(() => scene.render())
-  scene.debugLayer.show()
+  //scene.debugLayer.show()
   let gl = new BABYLON.GlowLayer("glow", scene)
 }())
 
