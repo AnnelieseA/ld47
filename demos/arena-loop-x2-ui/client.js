@@ -4,7 +4,7 @@ const $ = require('jquery')
 const _ = require('underscore')
 
 $('body').addClass('bg-black').append(`
-  <canvas id="renderCanvas" 
+  <canvas id="renderCanvas"  class="hide"
           style="
           width: 100%;
           height: 100%;
@@ -176,8 +176,6 @@ const createScene = async () => {
   //green: #33C268, pink: #ff1493
   sphere2.material = whiteMaterial2
 
-
-
   loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "arena.gltf", scene)
   global.arena = loadedMesh.meshes[0]
   arena.name = 'arena'
@@ -211,7 +209,7 @@ const createScene = async () => {
   let midNode3Speed = 0
   let intersected = false 
   scene.registerAfterRender( () => {
-
+    if(pausing) return
     if (!intersected && goodBot._children[0].intersectsMesh(evilBot._children[15], false)) {
       console.log('intersect!!!')
       cloneOnce()
@@ -241,12 +239,15 @@ const createScene = async () => {
       degress2 = degress2 + midNode2Speed
     }
   })
-
   return scene
 }
 
-(async function() {
-  const scene = await createScene()
+global.pausing = false
+global.scene = null
+global.initGame = async () => {
+  console.log('init game!')
+  $('#introUI').addClass('hide')
+  scene = await createScene()
   engine.runRenderLoop(() => scene.render())
   //scene.debugLayer.show()
   let gl = new BABYLON.GlowLayer("glow", scene)
@@ -255,8 +256,37 @@ const createScene = async () => {
     console.log('keydown')
     if(e.code === 'KeyD') incrementRate = 1
     if(e.code === 'KeyA') incrementRate = 0.1
+    if(e.code === 'Escape') {
+      pausing ? unpause() : pause()
+    }
   })
-  $(document).on('keyup', () => incrementRate = idleSpeed )
+  $(document).on('keyup', () => {
+    if(pausing) return
+    incrementRate = idleSpeed
+  })
+  $('#renderCanvas').removeClass('hide')
+}
 
-}())
+
+global.pause = () => {
+  console.log('pause')
+  pausing = true
+  //engine.stopRenderLoop()
+  scene.freezeActiveMeshes()
+  $('#pauseUI').removeClass('hide')
+}
+
+global.unpause = () => {
+  console.log('unpause')
+  pausing = false
+  //engine.runRenderLoop()
+  scene.unfreezeActiveMeshes()
+  $('#pauseUI').addClass('hide')
+}
+
+global.exitGame = () => {
+  engine.stopRenderLoop()
+  $('#renderCanvas').remove()
+  $('#pauseUI').html(`<div class="mute-30 center white p2">(you exited)</div>`)
+}
 
