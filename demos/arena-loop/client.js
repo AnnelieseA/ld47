@@ -9,7 +9,7 @@ $('body').addClass('bg-silver').append(`
           height: 600px;
           touch-action: none;">
   </canvas>
-  <p>click &amp; drag to rotate camera, Up/Left/Right/Down arrow keys to move camera position</p>
+  <p>Press Right/Left arrow keys to slow/speedup rotation</p>
 `)
 
 //little math helper:
@@ -20,6 +20,10 @@ const degreesToRadians = degrees => {
 
 const canvas = document.getElementById('renderCanvas')
 const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true})
+
+//idle rotation speed:
+let idleSpeed = 0.4
+let incrementRate = idleSpeed
 
 // CreateScene async function that creates and return the scene
 const createScene = async () => {
@@ -34,7 +38,7 @@ const createScene = async () => {
   camera.setTarget(new BABYLON.Vector3(-1.532, 12.588, -2.044))
 
   // Attach the camera to the canvas
-  camera.attachControl(canvas, false) //< UP/DOWN/LEFT/RIGHT keyboard controls...
+  //camera.attachControl(canvas, false) //< UP/DOWN/LEFT/RIGHT keyboard controls...
   //^ also mouse controlling
 
   // Create a basic light
@@ -110,8 +114,9 @@ const createScene = async () => {
   let degrees = 0
   scene.registerAfterRender( () => {
     //return
-    midNode.rotation.y = degreesToRadians(degrees + 1)
-    degrees = degrees + 1
+    //let incrementRate = getIncrementRate()
+    midNode.rotation.y = degreesToRadians(degrees + incrementRate)
+    degrees = degrees + incrementRate
   })
 
   return scene
@@ -122,5 +127,13 @@ const createScene = async () => {
   engine.runRenderLoop(() => scene.render())
   //scene.debugLayer.show()
   let gl = new BABYLON.GlowLayer("glow", scene)
+
+  $(document).on('keydown', e => {
+    console.log('keydown')
+    if(e.code === 'ArrowRight') incrementRate = 1.3
+    if(e.code === 'ArrowLeft') incrementRate = 0.05
+  })
+  $(document).on('keyup', () => incrementRate = idleSpeed )
+
 }())
 
