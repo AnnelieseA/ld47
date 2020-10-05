@@ -26,7 +26,7 @@ var CreateScene = function () {
     var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
     var ground2 = BABYLON.MeshBuilder.CreateGround("ground", {height: 300, width: 300, subdivisions: 4}, scene);
-    ground2.position.y = -30;
+    ground2.position.y = -50;
     ground2.physicsImpostor = new BABYLON.PhysicsImpostor(ground2, BABYLON.PhysicsImpostor.PlaneImpostor, { mass: 0, friction: 0, restitution: 0 });
     ground2.checkCollisions = true;
 
@@ -72,26 +72,19 @@ var CreateScene = function () {
             }),
         BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "arena.gltf", scene).then(function (result) {
             arena = result.meshes[0];
-            arena.position.y = -29;
+            arena.position.y = -49;
             arena.scaling.scaleInPlace(20);
         }),
     ]).then(() => {
         scene.createDefaultCameraOrLight(true, true, true);
         scene.activeCamera.alpha += Math.PI;
-        //ringArray.push(new RobotRing(new BABYLON.Vector3(0,0,0), Math.PI / 64, 20, [ Math.PI, 0]));
-        //ringArray.push(new RobotRing(new BABYLON.Vector3(20,0,10), Math.PI / 150, 20, [ Math.PI, Math.PI /4, 0]));
-        //ringArray.push(new RobotRing(new BABYLON.Vector3(-50,0,-20), Math.PI / 120, 20, [ Math.PI, 0]));
-        createRandomRobotRing();
-        //makeBots();
+        setInterval(createRandomRobotRing, 1000);
     });
 
     function randomInteger(min, max) {
         return Math.floor(Math.random() * (max - min + 1) ) + min;
     }
     
-    function makeBots() {
-        setInterval(createRandomRobotRing (), 200);
-    }
     function createRandomRobotRing () {
         var x = randomInteger(-220,220);
         var z = randomInteger(-220,220);
@@ -105,7 +98,6 @@ var CreateScene = function () {
             angleArray.push(BABYLON.Tools.ToRadians(angle));
         }
         ringArray.push(new RobotRing(new BABYLON.Vector3(x,0,z), Math.PI / speed, radius, angleArray));
-        setTimeout(createRandomRobotRing, 1000);
     }
     /*** ROBOT RING FUNCTIONS ***/
     //Make a robot that is part of the robotRing
