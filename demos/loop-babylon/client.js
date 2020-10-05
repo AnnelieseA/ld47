@@ -18,8 +18,6 @@ const degreesToRadians = degrees => {
   return degrees * (pi/180)
 }
 
-import * as BABYLON from 'babylonjs'
-
 // Get the canvas DOM element
 const canvas = document.getElementById('renderCanvas');
 // Load the 3D engine
