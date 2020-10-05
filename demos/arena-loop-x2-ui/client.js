@@ -29,7 +29,7 @@ const canvas = document.getElementById('renderCanvas')
 const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true})
 
 //idle rotation speed:
-let idleSpeed = 0.4
+let idleSpeed = 0.9
 let incrementRate = idleSpeed
 
 global.setParent = ( children, parent ) => {
@@ -197,6 +197,7 @@ const createScene = async () => {
 
   global.midNode2 = new BABYLON.TransformNode("midNode2")
   midNode2.position = new BABYLON.Vector3(14.415, 2.297, 13.847)
+  midNode2.rotation.y = degreesToRadians(99)
 
   setParent( [ring2,sphere2,sphere2Light,evilBot ], midNode2 )
 
@@ -205,7 +206,7 @@ const createScene = async () => {
 
   //rotation animation:
   let degrees = 0
-  let degress2 = 0
+  let degress2 = 99
   let degrees3 = 0
   let midNode3Speed = 0
   let intersected = false 
@@ -255,8 +256,8 @@ global.initGame = async () => {
 
   $(document).on('keydown', e => {
     console.log('keydown')
-    if(e.code === 'ArrowRight') incrementRate = 1
-    if(e.code === 'ArrowLeft') incrementRate = 0.1
+    if(e.code === 'ArrowRight') incrementRate = 1.5
+    if(e.code === 'ArrowLeft') incrementRate = idleSpeed - 0.5
     if(e.code === 'Escape') {
       pausing ? unpause() : pause()
     }
