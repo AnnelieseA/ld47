@@ -78,11 +78,35 @@ var CreateScene = function () {
     ]).then(() => {
         scene.createDefaultCameraOrLight(true, true, true);
         scene.activeCamera.alpha += Math.PI;
-        ringArray.push(new RobotRing(new BABYLON.Vector3(0,0,0), Math.PI / 64, 20, [ Math.PI, 0]));
-        ringArray.push(new RobotRing(new BABYLON.Vector3(20,0,10), Math.PI / 150, 20, [ Math.PI, Math.PI /4, 0]));
-        ringArray.push(new RobotRing(new BABYLON.Vector3(-50,0,-20), Math.PI / 120, 20, [ Math.PI, 0]));
+        //ringArray.push(new RobotRing(new BABYLON.Vector3(0,0,0), Math.PI / 64, 20, [ Math.PI, 0]));
+        //ringArray.push(new RobotRing(new BABYLON.Vector3(20,0,10), Math.PI / 150, 20, [ Math.PI, Math.PI /4, 0]));
+        //ringArray.push(new RobotRing(new BABYLON.Vector3(-50,0,-20), Math.PI / 120, 20, [ Math.PI, 0]));
+        createRandomRobotRing();
+        //makeBots();
     });
 
+    function randomInteger(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) ) + min;
+    }
+    
+    function makeBots() {
+        setInterval(createRandomRobotRing (), 200);
+    }
+    function createRandomRobotRing () {
+        var x = randomInteger(-220,220);
+        var z = randomInteger(-220,220);
+        var radius = randomInteger(10,80);
+        var numBots = randomInteger(1,5);
+        var speed = randomInteger(80,200);
+        var angleArray = [];
+        var angle;
+        for (var i=0; i<numBots; i++ ) {
+            angle = randomInteger(1,360);
+            angleArray.push(BABYLON.Tools.ToRadians(angle));
+        }
+        ringArray.push(new RobotRing(new BABYLON.Vector3(x,0,z), Math.PI / speed, radius, angleArray));
+        setTimeout(createRandomRobotRing, 1000);
+    }
     /*** ROBOT RING FUNCTIONS ***/
     //Make a robot that is part of the robotRing
     function makeRobot(pivot, startPos, mesh) {
