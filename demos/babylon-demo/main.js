@@ -17,8 +17,8 @@ var CreateScene = function () {
     // Enable Collisions
     scene.collisionsEnabled = true;
 
-    var camera = new BABYLON.ArcRotateCamera("Camera", BABYLON.Tools.ToRadians(90), BABYLON.Tools.ToRadians(90), 0.25, new BABYLON.Vector3(0, 0, 0), scene);    
-     // Create a camera, and set its position to {x: 0, y: 0, z: 0}
+    var camera = new BABYLON.ArcRotateCamera("Camera", BABYLON.Tools.ToRadians(-80), BABYLON.Tools.ToRadians(80), 280, new BABYLON.Vector3(0, 0, 0), scene);    
+    camera.attachControl(canvas, true);
     
     /*
      global.camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(-26.700, 80.173, -5.470), scene);
@@ -27,6 +27,7 @@ var CreateScene = function () {
     camera.rotation =  new BABYLON.Vector3(69.403, 82.248, 0);
     camera.setTarget(new BABYLON.Vector3(-1.532, 12.588, -2.044));
     */
+    camera.setTarget(new BABYLON.Vector3(0, 0, 0));
     var ringArray = [];   
     var goodRobot;
     var evilRobot;
@@ -34,13 +35,8 @@ var CreateScene = function () {
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
-    var ground2 = BABYLON.MeshBuilder.CreateGround("ground", {height: 300, width: 300, subdivisions: 4}, scene);
-    ground2.position.y = -50;
-    ground2.physicsImpostor = new BABYLON.PhysicsImpostor(ground2, BABYLON.PhysicsImpostor.PlaneImpostor, { mass: 0, friction: 0, restitution: 0 });
-    ground2.checkCollisions = true;
-
     //Main dude
-    var hero =  BABYLON.Mesh.CreateSphere("robot", 16, 4, scene);
+    var hero =  BABYLON.Mesh.CreateSphere("robot", 16, 10, scene);
     hero.physicsImpostor = new BABYLON.PhysicsImpostor(hero, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, friction: 0, restitution: 0 });
     hero.applyGravity = true;
     hero.checkCollisions = true;
@@ -58,13 +54,12 @@ var CreateScene = function () {
     scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
         inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
     }));
-
     
     //Load all meshes
     Promise.all([
         BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "good_bot.gltf", scene).then(function (result) {
             result.meshes[0].position.y = 10;
-            result.meshes[0].scaling.scaleInPlace(4);
+            result.meshes[0].scaling.scaleInPlace(7);
             goodRobot = result.meshes[0];
             goodRobot.position.x = -140;
             goodRobot.physicsImpostor = new BABYLON.PhysicsImpostor(goodRobot, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, friction: 0, restitution: 0 });
@@ -73,7 +68,7 @@ var CreateScene = function () {
             }),
         BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "evil_bot.gltf", scene).then(function (result) {
             evilRobot = result.meshes[0];
-            evilRobot.scaling.scaleInPlace(4);
+            evilRobot.scaling.scaleInPlace(7);
             evilRobot.physicsImpostor = new BABYLON.PhysicsImpostor(evilRobot, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, friction: 0, restitution: 0 });
             evilRobot.applyGravity = true;
             evilRobot.checkCollisions = true;
@@ -81,17 +76,17 @@ var CreateScene = function () {
             }),
         BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "arena.gltf", scene).then(function (result) {
             arena = result.meshes[0];
-            arena.position.y = -49;
-            arena.scaling.scaleInPlace(20);
+            arena.position.y = -50;
+            arena.scaling.scaleInPlace(17);
+            arena.physicsImpostor = new BABYLON.PhysicsImpostor(arena, BABYLON.PhysicsImpostor.PlaneImpostor, { mass: 0, friction: 0, restitution: 0 });
+            arena.checkCollisions = true;
         }),
         BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "dome.gltf", scene).then(function (result) {
             dome = result.meshes[0];
             dome.position.y = -49;
-            dome.scaling.scaleInPlace(75);
+            dome.scaling.scaleInPlace(65);
         }),
     ]).then(() => {
-        scene.createDefaultCameraOrLight(true, true, true);
-        scene.activeCamera.alpha += Math.PI;
         setInterval(createRandomRobotRing, 1000);
     });
 
@@ -99,20 +94,6 @@ var CreateScene = function () {
         return Math.floor(Math.random() * (max - min + 1) ) + min;
     }
     
-    function createRandomRobotRing () {
-        var x = randomInteger(-220,220);
-        var z = randomInteger(-220,220);
-        var radius = randomInteger(10,80);
-        var numBots = randomInteger(1,5);
-        var speed = randomInteger(80,200);
-        var angleArray = [];
-        var angle;
-        for (var i=0; i<numBots; i++ ) {
-            angle = randomInteger(1,360);
-            angleArray.push(BABYLON.Tools.ToRadians(angle));
-        }
-        ringArray.push(new RobotRing(new BABYLON.Vector3(x,0,z), Math.PI / speed, radius, angleArray));
-    }
     /*** ROBOT RING FUNCTIONS ***/
     //Make a robot that is part of the robotRing
     function makeRobot(pivot, startPos, mesh) {
@@ -159,10 +140,30 @@ var CreateScene = function () {
     }
 
 
-    // Animations
+    function createRandomRobotRing () {
+        var x = randomInteger(-200,200);
+        var z = randomInteger(-200,200);
+        var radius = randomInteger(20,70);
+        var numBots = randomInteger(2,6);
+        var speed = randomInteger(50,150);
+        var angleArray = [];
+        var angle;
+        for (var i=0; i<numBots; i++ ) {
+            angle = randomInteger(1,360);
+            angleArray.push(BABYLON.Tools.ToRadians(angle));
+        }
+        ringArray.push(new RobotRing(new BABYLON.Vector3(x,0,z), Math.PI / speed, radius, angleArray));
+    }
+
+    /*** FUNCTIONALITY ***/
+    //Rotate rings 7 check if dies
+    var alpha = 0;
     scene.beforeRender = function () {   
         ringArray.forEach( ring => {
             ring.pivot.rotate(BABYLON.Axis.Y, ring.speed, BABYLON.Space.LOCAL);
+            //ring.refBall.position = ring.pivot.position;
+            //ring.pivot.rotate(BABYLON.Axis.Y, ring.speed, BABYLON.Space.WORLD);
+            //ring.pivot.position.add(new BABYLON.Vector3(10 * Math.sin(alpha), 0, 10 * Math.cos(alpha)));
             ring.pivot.getChildren().forEach( bot => {
                 if (hero.intersectsMesh(bot, false)) {
 
@@ -172,9 +173,9 @@ var CreateScene = function () {
                 }
             });
         });
+        alpha+=0.2;
     };
     
-    //Rendering loop (executed for everyframe)
     scene.onBeforeRenderObservable.add(() => {
         //Manage the movements of the character (e.g. position, direction)
         if (inputMap["w"]) {
