@@ -18,6 +18,15 @@ var CreateScene = function () {
     scene.collisionsEnabled = true;
 
     var camera = new BABYLON.ArcRotateCamera("Camera", BABYLON.Tools.ToRadians(90), BABYLON.Tools.ToRadians(90), 0.25, new BABYLON.Vector3(0, 0, 0), scene);    
+     // Create a camera, and set its position to {x: 0, y: 0, z: 0}
+    
+    /*
+     global.camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(-26.700, 80.173, -5.470), scene);
+
+    // Set camera rotation and target:
+    camera.rotation =  new BABYLON.Vector3(69.403, 82.248, 0);
+    camera.setTarget(new BABYLON.Vector3(-1.532, 12.588, -2.044));
+    */
     var ringArray = [];   
     var goodRobot;
     var evilRobot;
@@ -74,6 +83,11 @@ var CreateScene = function () {
             arena = result.meshes[0];
             arena.position.y = -49;
             arena.scaling.scaleInPlace(20);
+        }),
+        BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "dome.gltf", scene).then(function (result) {
+            dome = result.meshes[0];
+            dome.position.y = -49;
+            dome.scaling.scaleInPlace(75);
         }),
     ]).then(() => {
         scene.createDefaultCameraOrLight(true, true, true);
