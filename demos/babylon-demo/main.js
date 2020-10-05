@@ -136,8 +136,9 @@ var CreateScene = function () {
             ring.pivot.getChildren().forEach( bot => {
                 if (hero.intersectsMesh(bot, false)) {
 
-                    //TODO do something on death
-                    window.alert("You died!");         
+                    //something on death
+                    $('.DEATH').removeClass('hide')
+                    setTimeout( () => $('.DEATH').addClass('hide') , 2000)
                 }
             });
         });
