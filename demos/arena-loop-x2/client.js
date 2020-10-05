@@ -25,6 +25,33 @@ const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, st
 let idleSpeed = 0.4
 let incrementRate = idleSpeed
 
+global.setParent = ( children, parent ) => {
+  children.forEach(child => child.parent = parent )
+}
+
+let currentRing = 'outer'
+
+global.swap = () => {
+
+  let spherePositionOld = sphere.position
+  let sphereLightPositionOld = sphereLight.position
+  let goodBotPositionOld = goodBot.position
+
+  sphere.position = sphere2.position
+  sphereLight.position = sphere2Light.position
+  goodBot.position = evilBot.position
+
+  sphere2.position = spherePositionOld
+  sphere2Light.position = sphereLightPositionOld
+  evilBot.position = goodBotPositionOld
+
+  setParent(goodBotParts, midNode2)
+  setParent(evilBotParts, midNode)
+
+  currentRing = 'inner'
+
+}
+
 // CreateScene async function that creates and return the scene
 const createScene = async () => {
   let scene = new BABYLON.Scene(engine)
@@ -57,7 +84,7 @@ const createScene = async () => {
   let goodBotSphere = _.findWhere(goodBot._children, { id: "Cube.001"})
   goodBotSphere.setEnabled(false)
 
-  let sphere = BABYLON.Mesh.CreateSphere('sphere', 16, 2.5, scene, false, BABYLON.Mesh.FRONTSIDE)
+  global.sphere = BABYLON.Mesh.CreateSphere('sphere', 16, 2.5, scene, false, BABYLON.Mesh.FRONTSIDE)
   // Move sphere into position:
   sphere.position = new BABYLON.Vector3( -2, 4.548, -27.562)
 
@@ -69,7 +96,7 @@ const createScene = async () => {
   sphere.material = whiteMaterial
 
   // Create a basic light
-  let sphereLight = new BABYLON.PointLight('sphereLight', new BABYLON.Vector3(-2, 4.548, -25.897, scene))
+  global.sphereLight = new BABYLON.PointLight('sphereLight', new BABYLON.Vector3(-2, 4.548, -25.897, scene))
   sphereLight.intensity = 1000.000
   sphereLight.diffuse = new BABYLON.Color3.FromHexString('#D8C0F0')
 
@@ -100,12 +127,12 @@ const createScene = async () => {
   ring2._children [0].material.anisotropy.intensity = 0.86
 
 
-  let sphere2 = BABYLON.Mesh.CreateSphere('sphere', 16, 2.5, scene, false, BABYLON.Mesh.FRONTSIDE)
+  global.sphere2 = BABYLON.Mesh.CreateSphere('sphere', 16, 2.5, scene, false, BABYLON.Mesh.FRONTSIDE)
   // Move sphere into position:
   sphere2.position = new BABYLON.Vector3( -1.900, 1.553, -9.157)
 
   // Create a basic light
-  let sphere2Light = new BABYLON.PointLight('sphereLight', new BABYLON.Vector3(-1.900, 1.553, -9.157, scene))
+  global.sphere2Light = new BABYLON.PointLight('sphereLight', new BABYLON.Vector3(-1.900, 1.553, -9.157, scene))
   sphere2Light.intensity = 1000.000
   sphere2Light.diffuse = new BABYLON.Color3.FromHexString('#d2f0c0')
 
@@ -130,21 +157,20 @@ const createScene = async () => {
 
 
   //create parent object ('midNode') to use as a sort of origin point for the basis of rotation (or movement):
-  let midNode = new BABYLON.TransformNode("midNode")
+  global.midNode = new BABYLON.TransformNode("midNode")
   midNode.position = new BABYLON.Vector3(1, 2.297, 2.500)
 
   //set the other objects to be children:
-  sphere.parent = midNode
-  sphereLight.parent = midNode
-  ring.parent = midNode
-  goodBot.parent = midNode
+  setParent( [ring,sphere,sphereLight,goodBot ], midNode )
 
-  let midNode2 = new BABYLON.TransformNode("midNode2")
+  global.midNode2 = new BABYLON.TransformNode("midNode2")
   midNode2.position = new BABYLON.Vector3(14.415, 2.297, 13.847)
-  ring2.parent = midNode2
-  sphere2.parent = midNode2
-  sphere2Light.parent = midNode2
-  evilBot.parent = midNode2
+
+
+  setParent( [ring2,sphere2,sphere2Light,evilBot ], midNode2 )
+
+  global.goodBotParts = [sphere,sphereLight,goodBot ]
+  global.evilBotParts = [sphere2,sphere2Light,evilBot ]
 
   //rotation animation:
   let degrees = 0
@@ -152,11 +178,19 @@ const createScene = async () => {
   scene.registerAfterRender( () => {
     //return
     //let incrementRate = getIncrementRate()
-    midNode.rotation.y = degreesToRadians(degrees + incrementRate)
-    degrees = degrees + incrementRate
+    let midNodeSpeed = currentRing === 'outer' ? incrementRate : idleSpeed
+    midNode.rotation.y = degreesToRadians(degrees + midNodeSpeed)
+    degrees = degrees + midNodeSpeed
 
-    midNode2.rotation.y = degreesToRadians(degress2 + idleSpeed)
-    degress2 = degress2 + idleSpeed
+    let midNode2Speed = currentRing === 'outer' ? idleSpeed : incrementRate
+    midNode2.rotation.y = degreesToRadians(degress2 + midNode2Speed)
+    degress2 = degress2 + midNode2Speed
+    if (goodBot._children[0].intersectsMesh(evilBot._children[15], false)) {
+      console.log('intersect!!!')
+      swap()
+      evilBot._children.forEach( child => child.visibility = 0)
+    }
+
   })
 
   return scene
@@ -165,7 +199,7 @@ const createScene = async () => {
 (async function() {
   const scene = await createScene()
   engine.runRenderLoop(() => scene.render())
-  //scene.debugLayer.show()
+  scene.debugLayer.show()
   let gl = new BABYLON.GlowLayer("glow", scene)
 
   $(document).on('keydown', e => {
