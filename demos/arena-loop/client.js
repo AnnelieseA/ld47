@@ -39,7 +39,7 @@ const createScene = async () => {
 
   // Create a basic light
   let light = new BABYLON.PointLight('light1', new BABYLON.Vector3(0, 1, 0), scene)
-  light.intensity = 4000.000
+  light.intensity = 1500.000
   light.diffuse = new BABYLON.Color3(0.922, 0.855, 0.710)
   light.position.y = 22.573
 
@@ -57,14 +57,24 @@ const createScene = async () => {
   // Move sphere into position:
   sphere.position = new BABYLON.Vector3( -2, 4.548, -25.897)
 
+  // Create a basic light
+  let sphereLight = new BABYLON.PointLight('sphereLight', new BABYLON.Vector3(-2, 4.548, -25.897, scene))
+  sphereLight.intensity = 1000.000
+  sphereLight.diffuse = new BABYLON.Color3.FromHexString('#D8C0F0')
+
   loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "ring2.gltf", scene)
   global.ring = loadedMesh.meshes[0]
   ring.name = "ring"
-  ring.position = new BABYLON.Vector3(1, 2.297, 2.500)
   ring.scaling = new BABYLON.Vector3( 15, 15, -15 )
+  ring._children [0].material.anisotropy.isEnabled = true
+  ring._children [0].material.anisotropy.intensity = 0.86
 
   let whiteMaterial = new BABYLON.StandardMaterial("texture1", scene)
   whiteMaterial.diffuseColor = new BABYLON.Color3(255, 255, 255)
+  whiteMaterial.name = 'whiteMaterial'
+  whiteMaterial.emissiveColor = BABYLON.Color3.FromHexString('#ff1493')
+  //green: #33C268
+  //pink: #ff1493
   sphere.material = whiteMaterial
 
   loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "arena.gltf", scene)
@@ -80,11 +90,12 @@ const createScene = async () => {
 
   //create parent object ('midNode') to use as a sort of origin point for the basis of rotation (or movement):
   let midNode = new BABYLON.TransformNode("midNode")
+  midNode.position = new BABYLON.Vector3(1, 2.297, 2.500)
 
   //set the other objects to be children:
   sphere.parent = midNode
+  sphereLight.parent = midNode
   ring.parent = midNode
-
 
   //shadows... no diff?
   arenaPlane.receiveShadows = true
@@ -108,5 +119,6 @@ const createScene = async () => {
   const scene = await createScene()
   engine.runRenderLoop(() => scene.render())
   scene.debugLayer.show()
+  let gl = new BABYLON.GlowLayer("glow", scene)
 }())
 
