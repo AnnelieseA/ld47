@@ -52,6 +52,33 @@ global.swap = () => {
 
 }
 
+const clone = () => {
+  global.midNodeClone = midNode.clone('midNodeClone')
+  let ringA = _.findWhere( midNodeClone._children, { name : 'midNodeClone.ring' })
+  // ringA.setEnabled(false)
+  // midNodeClone._children = _.without( midNodeClone._children, ringA )
+  ringA.dispose()
+
+  //midNodeClone.makeGeometryUnique()
+  midNodeClone.showBoundingBox = true
+
+  const midNode2Clone = midNode2.clone('midNode2Clone')
+  let ringB = _.findWhere( midNode2Clone._children, { name : 'midNode2Clone.ring2' })
+  ringB.dispose()
+
+  global.midNode3 = new BABYLON.TransformNode("midNode3")
+  midNode2Clone.parent = midNode3
+  midNodeClone.parent = midNode3
+
+  // midNode3.setPivotPoint( midNode2Clone.position )
+  // midNode3.setPivotPoint( sphere.position )
+  midNode3.setPivotPoint( sphere.getAbsolutePivotPoint() )
+
+  //now i can rotate!
+}
+
+const cloneOnce = _.once( clone )
+
 // CreateScene async function that creates and return the scene
 const createScene = async () => {
   let scene = new BABYLON.Scene(engine)
@@ -77,7 +104,7 @@ const createScene = async () => {
   //load meshes:
   let loadedMesh = await BABYLON.SceneLoader.ImportMeshAsync("", "meshes/", "good_bot2.0.gltf", scene)
   global.goodBot = loadedMesh.meshes[0]
-  goodBot.position = new BABYLON.Vector3(-1.98, 4.939, -26.867)
+  goodBot.position = new BABYLON.Vector3(-1.98, 1.831, -27.504)
   goodBot.name = 'goodBot'
   goodBot.scaling = new BABYLON.Vector3(2.694, 2.694,2.694)
 
@@ -86,7 +113,7 @@ const createScene = async () => {
 
   global.sphere = BABYLON.Mesh.CreateSphere('sphere', 16, 2.5, scene, false, BABYLON.Mesh.FRONTSIDE)
   // Move sphere into position:
-  sphere.position = new BABYLON.Vector3( -2, 4.548, -27.562)
+  sphere.position = new BABYLON.Vector3( -2, 2.943, -27.562)
 
   let whiteMaterial = new BABYLON.StandardMaterial("texture1", scene)
   whiteMaterial.diffuseColor = new BABYLON.Color3(255, 255, 255)
@@ -166,7 +193,6 @@ const createScene = async () => {
   global.midNode2 = new BABYLON.TransformNode("midNode2")
   midNode2.position = new BABYLON.Vector3(14.415, 2.297, 13.847)
 
-
   setParent( [ring2,sphere2,sphere2Light,evilBot ], midNode2 )
 
   global.goodBotParts = [sphere,sphereLight,goodBot ]
@@ -175,22 +201,39 @@ const createScene = async () => {
   //rotation animation:
   let degrees = 0
   let degress2 = 0
+  let degrees3 = 0
+  let midNode3Speed = 0
+  let intersected = false 
   scene.registerAfterRender( () => {
-    //return
-    //let incrementRate = getIncrementRate()
-    let midNodeSpeed = currentRing === 'outer' ? incrementRate : idleSpeed
-    midNode.rotation.y = degreesToRadians(degrees + midNodeSpeed)
-    degrees = degrees + midNodeSpeed
 
-    let midNode2Speed = currentRing === 'outer' ? idleSpeed : incrementRate
-    midNode2.rotation.y = degreesToRadians(degress2 + midNode2Speed)
-    degress2 = degress2 + midNode2Speed
-    if (goodBot._children[0].intersectsMesh(evilBot._children[15], false)) {
+    if (!intersected && goodBot._children[0].intersectsMesh(evilBot._children[15], false)) {
       console.log('intersect!!!')
-      swap()
-      evilBot._children.forEach( child => child.visibility = 0)
+      cloneOnce()
+      midNode3Speed = 9
+      evilBotParts.forEach( part => part.setEnabled(false))
+      goodBotParts.forEach( part => part.setEnabled(false))
+      intersected = true
     }
+    if(midNode3Speed) {
+      midNode3.rotation.y = degreesToRadians(degrees3 + midNode3Speed)
+      degrees3 = degrees3 + midNode3Speed
+      if(midNode3.rotation.y > degreesToRadians(360)) {
+        midNode3Speed = 0
+        midNode3.dispose()
+        swap()
+        evilBotParts.forEach( part => part.setEnabled(true))
+        goodBotParts.forEach( part => part.setEnabled(true))
+        //engine.stopRenderLoop()
+      }
+    } else {
+      let midNodeSpeed = currentRing === 'outer' ? incrementRate : idleSpeed
+      midNode.rotation.y = degreesToRadians(degrees + midNodeSpeed)
+      degrees = degrees + midNodeSpeed
 
+      let midNode2Speed = currentRing === 'outer' ? idleSpeed : incrementRate
+      midNode2.rotation.y = degreesToRadians(degress2 + midNode2Speed)
+      degress2 = degress2 + midNode2Speed
+    }
   })
 
   return scene
